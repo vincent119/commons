@@ -1,5 +1,4 @@
 package errorx
-package errorx
 
 import (
 	"errors"

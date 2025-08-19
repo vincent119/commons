@@ -54,3 +54,86 @@ func ToSnake(s string) string {
 	}
 	return out
 }
+
+
+// EscapeBackslash 處理字串中的反斜線，將單反斜線替換為雙反斜線
+func EscapeBackslash(s string) string {
+	return strings.ReplaceAll(s, "\\", "\\\\")
+}
+
+// UnescapeBackslash 還原已轉義的反斜線
+func UnescapeBackslash(s string) string {
+	return strings.ReplaceAll(s, "\\\\", "\\")
+}
+
+// EscapeSQLString 安全處理 SQL 字符串中的特殊字符
+func EscapeSQLString(s string) string {
+	s = strings.ReplaceAll(s, "\\", "\\\\") // 替換反斜線為雙反斜線
+	s = strings.ReplaceAll(s, "'", "\\'")   // 替換單引號
+	s = strings.ReplaceAll(s, "\"", "\\\"") // 替換雙引號
+	return s
+}
+
+// NormalizePathSeparator 標準化路徑分隔符（跨平台）
+func NormalizePathSeparator(path string) string {
+	// 將 Windows 風格的反斜線替換為正斜線
+	return strings.ReplaceAll(path, "\\", "/")
+}
+
+// BuildLikeQueryValue 產生用於 LIKE 查詢的字串值，包含通配符
+func BuildLikeQueryValue(value string, position string) string {
+	// 處理輸入值中的特殊字元
+	escaped := EscapeLikeQuery(value)
+
+	// 根據位置增加通配符
+	switch position {
+	case "start":
+		return escaped + "%"
+	case "end":
+		return "%" + escaped
+	case "both":
+		return "%" + escaped + "%"
+	default:
+		return escaped
+	}
+}
+
+// EscapeLikeQuery 處理 LIKE 查詢中的特殊字元
+func EscapeLikeQuery(s string) string {
+	// 處理 SQL LIKE 查詢中的特殊字元 (%, _, \)
+	s = strings.ReplaceAll(s, "\\", "\\\\") // 替換反斜線為雙反斜線
+	s = strings.ReplaceAll(s, "%", "\\%")   // 替換百分號
+	s = strings.ReplaceAll(s, "_", "\\_")   // 替換下劃線
+	return s
+}
+
+// IsEmpty 檢查字串是否為空
+func IsEmpty(s string) bool {
+	return len(strings.TrimSpace(s)) == 0
+}
+
+// Truncate 截斷字串到指定長度
+func Truncate(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen]
+}
+
+// EscapeJSON 處理JSON字串中的特殊字符
+func EscapeJSON(s string) string {
+	s = strings.ReplaceAll(s, "\\", "\\\\")
+	s = strings.ReplaceAll(s, "\"", "\\\"")
+	s = strings.ReplaceAll(s, "\n", "\\n")
+	s = strings.ReplaceAll(s, "\r", "\\r")
+	s = strings.ReplaceAll(s, "\t", "\\t")
+	return s
+}
+
+// FormatSQLForLog 格式化SQL語句以便於日誌記錄
+func FormatSQLForLog(sql string) string {
+	// 移除多餘空白
+	sql = strings.Join(strings.Fields(sql), " ")
+	// 移除日誌中的雙重轉義
+	return UnescapeBackslash(sql)
+}

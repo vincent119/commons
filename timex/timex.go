@@ -25,3 +25,14 @@ func StartOfDay(t time.Time, loc *time.Location) time.Time {
 func TruncateTo(t time.Time, d time.Duration) time.Time {
 	return t.UTC().Truncate(d)
 }
+
+
+// FormatTime 格式化時間為字串
+func FormatTime(t time.Time, layout string) string {
+	return t.Format(layout)
+}
+
+// ParseTime 解析字串為時間
+func ParseTime(str, layout string) (time.Time, error) {
+	return time.Parse(layout, str)
+}
