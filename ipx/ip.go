@@ -1,4 +1,4 @@
-// Package net 提供 IP 位址相關的通用工具函式。
+// Package ipx 提供 IP 位址相關的通用工具函式。
 //
 // 此套件包含以下功能：
 //   - IP 驗證：IsValidIP、IsIPv4、IsIPv6、IsPublicIP
@@ -7,7 +7,7 @@
 //   - 地理位置：GetLocationByIP（可整合 GeoIP2）
 //   - 客戶端 IP 偵測：GetClientIP（支援 X-Forwarded-For、X-Real-IP）
 //   - 本機 IP 取得：GetLocalIPs
-package net
+package ipx
 
 import (
 	"encoding/binary"
