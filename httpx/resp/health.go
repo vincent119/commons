@@ -1,4 +1,4 @@
-package responsex
+package resp
 
 // Health represents health check response
 type Health struct {

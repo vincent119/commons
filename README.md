@@ -17,6 +17,152 @@ go get github.com/vincent119/commons
 
 ## 套件列表
 
+| 套件 | 說明 |
+|------|------|
+| `stringx` | 字串處理（snake_case、跳脫等）|
+| `errorx` | 錯誤包裝與判斷 |
+| `slicex` | 泛型切片操作（Contains、Filter、Map 等）|
+| `timex` | 時區安全的時間操作 |
+| `uuidx` | UUID 產生與驗證 |
+| `cryptox` | MD5、SHA256 雜湊 |
+| `validatorx` | 格式驗證（Email、手機、IP 等）|
+| `ipx` | IP 位址工具（驗證、轉換、網段、GeoIP）|
+| `sqlx` | SQL 查詢工具（LIKE 跳脫、字串跳脫）|
+| `jsonx` | JSON 字串跳脫 |
+| `pathx` | 路徑處理（分隔符正規化）|
+| `httpx/resp` | HTTP 回應結構定義 |
+| `awsx/s3` | AWS S3 路徑工具 |
+
+---
+
+### ipx - IP 位址工具
+
+提供完整的 IP 位址驗證、轉換、網段計算與 GeoIP 整合。
+
+```go
+import "github.com/vincent119/commons/ipx"
+
+// IP 驗證
+ipx.IsValidIP("192.168.1.1")     // true
+ipx.IsIPv4("192.168.1.1")        // true
+ipx.IsIPv6("2001:db8::1")        // true
+ipx.IsPublicIP("8.8.8.8")        // true
+
+// IP 轉換
+n, _ := ipx.IPv4ToUint32("192.168.1.1")  // 3232235777
+ip := ipx.Uint32ToIPv4(3232235777)       // "192.168.1.1"
+expanded, _ := ipx.ExpandIPv6("::1")     // "0000:0000:...:0001"
+
+// 網段工具
+inCIDR, _ := ipx.IsIPInCIDR("192.168.1.100", "192.168.1.0/24") // true
+info, _ := ipx.GetNetworkInfo("192.168.1.0/24")
+// info.Network = "192.168.1.0"
+// info.Broadcast = "192.168.1.255"
+// info.TotalHosts = 254
+
+// 地理位置
+location := ipx.GetLocationByIP("127.0.0.1")     // "本地"
+location := ipx.GetLocationByIP("192.168.1.1")   // "內部網絡"
+
+// 取得客戶端 IP（從 HTTP headers）
+clientIP := ipx.GetClientIP(headers)
+
+// 取得本機 IP
+localIPs := ipx.GetLocalIPs()  // "192.168.1.100,10.0.0.5"
+```
+
+---
+
+### sqlx - SQL 查詢工具
+
+提供 LIKE 查詢跳脫與 SQL 字串處理。
+
+```go
+import "github.com/vincent119/commons/sqlx"
+
+// LIKE 查詢跳脫
+escaped := sqlx.EscapeLikeQuery("50%_off")  // "50\%\_off"
+
+// 建構 LIKE 查詢值（含通配符）
+like := sqlx.BuildLikeQueryValue("test", sqlx.LikePosBoth)  // "%test%"
+
+// 位置常數
+// - LikePosStart: 前綴匹配 "value%"
+// - LikePosEnd:   後綴匹配 "%value"
+// - LikePosBoth:  包含匹配 "%value%"
+
+// 搭配 ESCAPE 子句
+query := "WHERE name LIKE ? " + sqlx.LikeEscapeClause()
+
+// SQL 字串跳脫（不能取代 prepared statement）
+escaped := sqlx.EscapeSQLString("O'Reilly")  // "O\'Reilly"
+
+// Log 格式化
+formatted := sqlx.FormatSQLForLog("SELECT * FROM   users")
+```
+
+**主要函式：**
+
+- `EscapeLikeQuery(s string) string` - 轉義 LIKE 特殊字元
+- `BuildLikeQueryValue(value, position string) string` - 建構 LIKE 查詢值
+- `LikeEscapeClause() string` - 回傳 ESCAPE 子句
+- `EscapeSQLString(s string) string` - 基礎 SQL 跳脫
+- `FormatSQLForLog(sql string) string` - Log 格式化
+
+---
+
+### jsonx - JSON 處理工具
+
+提供 JSON 字串跳脫。
+
+```go
+import "github.com/vincent119/commons/jsonx"
+
+// JSON 字串跳脫
+escaped := jsonx.EscapeJSON("line1\nline2")  // "line1\\nline2"
+```
+
+**主要函式：**
+
+- `EscapeJSON(s string) string` - 跳脫 JSON 特殊字元（\, ", \n, \r, \t）
+
+---
+
+### pathx - 路徑處理工具
+
+提供跨平台路徑處理。
+
+```go
+import "github.com/vincent119/commons/pathx"
+
+// 路徑分隔符正規化
+path := pathx.NormalizePathSeparator("a\\b\\c")  // "a/b/c"
+```
+
+**主要函式：**
+
+- `NormalizePathSeparator(path string) string` - 將 \ 轉換為 /
+
+---
+
+### awsx/s3 - AWS S3 路徑工具
+
+提供 S3 路徑前綴建構工具。
+
+```go
+import "github.com/vincent119/commons/awsx/s3"
+
+// 建構 S3 路徑前綴
+prefix := s3.BuildS3Prefix("bucket/prefix", "media/images")
+// "bucket/prefix/media/images/"
+
+// 通用路徑前綴（支援多段）
+prefix := s3.BuildPrefix("uploads", "2025", "12")
+// "uploads/2025/12/"
+```
+
+---
+
 ### stringx - 字串處理
 
 提供高效的字串轉換與處理功能。
@@ -25,12 +171,26 @@ go get github.com/vincent119/commons
 import "github.com/vincent119/commons/stringx"
 
 // 轉換為 snake_case
-s := stringx.ToSnake("UserID") // "user_i_d"
+s := stringx.ToSnake("UserID")  // "user_i_d"
+
+// 反斜線處理
+escaped := stringx.EscapeBackslash("a\\b")    // "a\\\\b"
+unescaped := stringx.UnescapeBackslash("a\\\\b")  // "a\\b"
+
+// 字串工具
+stringx.IsEmpty("")       // true
+stringx.Truncate("hello world", 5)  // "hello"
 ```
 
 **主要函式：**
 
 - `ToSnake(s string) string` - 將字串轉為 snake_case
+- `EscapeBackslash(s string) string` - 將 \ 轉為 \\
+- `UnescapeBackslash(s string) string` - 將 \\ 還原為 \
+- `IsEmpty(s string) bool` - 判斷是否為空
+- `Truncate(s string, maxLen int) string` - 截斷字串
+
+---
 
 ### errorx - 錯誤處理
 
@@ -49,43 +209,22 @@ if errorx.Is(err, target) { ... }
 cause := errorx.Cause(err)
 ```
 
-**主要函式：**
-
-- `Wrap(err error, msg string) error` - 包裝錯誤並加上訊息
-- `Is(err, target error) bool` - 判斷錯誤鏈是否包含特定錯誤
-- `As[T any](err error, target *T) bool` - 嘗試將錯誤轉型
-- `Cause(err error) error` - 取出最底層錯誤
+---
 
 ### slicex - 切片操作
 
-提供泛型切片操作函式，類似 JavaScript 的陣列方法。
+提供泛型切片操作函式。
 
 ```go
 import "github.com/vincent119/commons/slicex"
 
-// 檢查元素是否存在
-found := slicex.Contains([]int{1, 2, 3}, 2) // true
-
-// 尋找元素索引
-idx := slicex.IndexOf([]string{"a", "b", "c"}, "b") // 1
-
-// 過濾元素
-evens := slicex.Filter([]int{1, 2, 3, 4}, func(n int) bool {
-    return n%2 == 0
-}) // [2, 4]
-
-// 映射轉換
-strs := slicex.Map([]int{1, 2, 3}, func(n int) string {
-    return fmt.Sprintf("%d", n)
-}) // ["1", "2", "3"]
+slicex.Contains([]int{1, 2, 3}, 2)  // true
+slicex.IndexOf([]string{"a", "b"}, "b")  // 1
+slicex.Filter([]int{1, 2, 3, 4}, func(n int) bool { return n%2 == 0 })  // [2, 4]
+slicex.Map([]int{1, 2}, func(n int) string { return fmt.Sprint(n) })  // ["1", "2"]
 ```
 
-**主要函式：**
-
-- `Contains[T comparable](s []T, v T) bool` - 檢查是否包含元素
-- `IndexOf[T comparable](s []T, v T) int` - 回傳元素索引
-- `Filter[T any](s []T, f func(T) bool) []T` - 過濾元素
-- `Map[T any, R any](s []T, f func(T) R) []R` - 映射轉換
+---
 
 ### timex - 時間處理
 
@@ -94,176 +233,76 @@ strs := slicex.Map([]int{1, 2, 3}, func(n int) string {
 ```go
 import "github.com/vincent119/commons/timex"
 
-// 取得 UTC 時間
-utc := timex.NowUTC()
-
-// 取得某天的零點（指定時區）
-start := timex.StartOfDay(time.Now(), time.Local)
-
-// 時間截斷
-truncated := timex.TruncateTo(time.Now(), time.Hour)
-
-// 時間戳
-ts := timex.TimeStampUTC() // "2025-12-18T10:30:00.000Z"
-date := timex.DateStamp()  // "2025-12-18"
+timex.NowUTC()                           // UTC 時間
+timex.StartOfDay(time.Now(), time.Local) // 當天零點
+timex.TimeStampUTC()                     // "2025-12-19T10:30:00.000Z"
+timex.DateStamp()                        // "2025-12-19"
 ```
 
-**主要函式：**
-
-- `NowUTC() time.Time` - 取得目前 UTC 時間
-- `StartOfDay(t time.Time, loc *time.Location) time.Time` - 回傳指定時區的零點
-- `TruncateTo(t time.Time, d time.Duration) time.Time` - 截斷時間至指定粒度
-- `FormatTime(t time.Time, layout string) string` - 格式化時間
-- `ParseTime(str, layout string) (time.Time, error)` - 解析時間字串
-- `TimeStamp() string` - 取得目前時間戳
-- `TimeStampUTC() string` - 取得 UTC 時間戳
-- `DateStamp() string` - 取得目前日期
+---
 
 ### uuidx - UUID 工具
-
-封裝 google/uuid 的便利函式。
 
 ```go
 import "github.com/vincent119/commons/uuidx"
 
-// 產生新的 UUID
-id := uuidx.NewUUID()
-
-// 驗證 UUID 格式
-valid := uuidx.IsValidUUID("550e8400-e29b-41d4-a716-446655440000")
+uuidx.NewUUID()      // 產生 UUID v4
+uuidx.IsValidUUID("550e8400-e29b-41d4-a716-446655440000")  // true
 ```
 
-**主要函式：**
-
-- `NewUUID() string` - 產生新的 UUID v4
-- `NewUUIDv4() string` - 產生新的 UUID v4
-- `NewUUIDv5(namespace uuid.UUID, name string) string` - 產生 UUID v5
-- `IsValidUUID(s string) bool` - 驗證 UUID 格式
+---
 
 ### cryptox - 加密工具
-
-提供常用的雜湊函式。
 
 ```go
 import "github.com/vincent119/commons/cryptox"
 
-// MD5 雜湊
-hash := cryptox.MD5Hash("password")
-
-// SHA256 雜湊
-sha := cryptox.SHA256Hash("data")
+cryptox.MD5Hash("password")   // MD5 雜湊
+cryptox.SHA256Hash("data")    // SHA256 雜湊
 ```
 
-**主要函式：**
-
-- `MD5Hash(s string) string` - 回傳 MD5 雜湊
-- `SHA256Hash(s string) string` - 回傳 SHA256 雜湊
+---
 
 ### validatorx - 驗證工具
-
-提供常用的格式驗證函式。
 
 ```go
 import "github.com/vincent119/commons/validatorx"
 
-// Email 驗證
-valid := validatorx.IsEmail("user@example.com")
-
-// 手機號驗證（台灣）
-valid := validatorx.IsMobile("0912345678")
-
-// UUID 驗證
-valid := validatorx.IsUUID("550e8400-e29b-41d4-a716-446655440000")
-
-// IPv4 驗證
-valid := validatorx.IsIPv4("192.168.1.1")
+validatorx.IsEmail("user@example.com")  // true
+validatorx.IsMobile("0912345678")       // true
+validatorx.IsIPv4("192.168.1.1")        // true
 ```
 
-**主要函式：**
+---
 
-- `IsEmail(email string) bool` - 驗證 Email 格式
-- `IsMobile(mobile string) bool` - 驗證台灣手機號格式
-- `IsUUID(u string) bool` - 驗證 UUID 格式
-- `IsIPv4(ip string) bool` - 驗證 IPv4 格式
-- `IsIPv6(ip string) bool` - 驗證 IPv6 格式
-
-### modelx - 通用模型
-
-提供常用的回應結構定義。
+### httpx/resp - HTTP 回應結構
 
 ```go
-import "github.com/vincent119/commons/modelx"
+import "github.com/vincent119/commons/httpx/resp"
 
-// 錯誤回應
-errResp := modelx.ErrorResponse{
-    Code:    401,
-    Message: "unauthorized",
-}
-
-// 健康檢查回應
-health := modelx.ResponseHealthCheck{
-    Status: "ok",
-}
+resp.Error{Code: 401, Message: "unauthorized"}
+resp.Health{Status: "ok"}
 ```
 
-## 完整範例
-
-```go
-package main
-
-import (
-    "fmt"
-    "github.com/vincent119/commons/stringx"
-    "github.com/vincent119/commons/timex"
-    "github.com/vincent119/commons/slicex"
-    "github.com/vincent119/commons/uuidx"
-    "github.com/vincent119/commons/validatorx"
-)
-
-func main() {
-    // 字串處理
-    snake := stringx.ToSnake("UserProfileData")
-    fmt.Println(snake) // "user_profile_data"
-
-    // 時間處理
-    now := timex.NowUTC()
-    timestamp := timex.TimeStampUTC()
-    fmt.Println(timestamp)
-
-    // 切片操作
-    nums := []int{1, 2, 3, 4, 5}
-    evens := slicex.Filter(nums, func(n int) bool { return n%2 == 0 })
-    fmt.Println(evens) // [2, 4]
-
-    // UUID 產生
-    id := uuidx.NewUUID()
-    fmt.Println(id)
-
-    // 驗證
-    isEmail := validatorx.IsEmail("test@example.com")
-    fmt.Println(isEmail) // true
-}
-```
+---
 
 ## 開發指令
 
 ```bash
-# 整理依賴
-make tidy
-
-# 程式碼檢查
-make lint
-
-# 執行測試
-make test
-
-# 效能基準測試
-make bench
+make help          # 顯示所有可用指令
+make tidy          # 整理依賴
+make fmt           # 格式化程式碼
+make check         # 程式碼檢查（vet + lint）
+make test          # 執行測試
+make coverage      # 顯示覆蓋率報告
+make coverage-html # 產生 HTML 覆蓋率報告
+make bench         # 效能基準測試
+make clean         # 清理產生的檔案
 ```
 
 ## 系統需求
 
-- Go 1.25+
+- Go 1.21+
 
 ## 依賴
 

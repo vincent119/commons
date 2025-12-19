@@ -1,4 +1,4 @@
-package responsex
+package resp
 
 // Error represents a standard API error response
 type Error struct {
