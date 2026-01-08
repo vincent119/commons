@@ -3,6 +3,10 @@
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![Tests](https://github.com/vincent119/commons/actions/workflows/test.yml/badge.svg)](https://github.com/vincent119/commons/actions/workflows/test.yml)
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/vincent119/bb75e501e45c27a5ace60a06e63cc15e/raw/commons-coverage.json)](https://github.com/vincent119/commons)
+[![Go Report Card](https://goreportcard.com/badge/github.com/vincent119/commons)](https://goreportcard.com/report/github.com/vincent119/commons)
+[![Go Reference](https://pkg.go.dev/badge/github.com/vincent119/commons.svg)](https://pkg.go.dev/github.com/vincent119/commons)
+[![License](https://img.shields.io/github/license/vincent119/commons.svg)](https://github.com/vincent119/commons/blob/main/LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/vincent119/commons.svg)](https://github.com/vincent119/commons/releases)
 
 一個輕量的 Go 工具庫，提供常用功能的泛型與高效能實作。
 
