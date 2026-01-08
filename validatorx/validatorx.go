@@ -4,7 +4,8 @@ import "regexp"
 
 // IsEmail 驗證 email 格式
 func IsEmail(email string) bool {
-	re := regexp.MustCompile(`^[\w\.\-]+@[\w\-]+\.[a-zA-Z]{2,}$`)
+	// 修正: 支援多級域名 (例如 .co.uk)
+	re := regexp.MustCompile(`^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,}$`)
 	return re.MatchString(email)
 }
 
@@ -40,13 +41,15 @@ func IsURL(url string) bool {
 
 // IsDate 驗證日期格式（YYYY-MM-DD）。
 func IsDate(date string) bool {
-	re := regexp.MustCompile(`^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$`)
+	// 修正: 移除重複的反斜線，在 backticks 中 \d 即可
+	re := regexp.MustCompile(`^(19|20)\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$`)
 	return re.MatchString(date)
 }
 
 // IsTime 驗證時間格式（HH:MM:SS，24 小時制）。
 func IsTime(timeStr string) bool {
-	re := regexp.MustCompile(`^([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d$`)
+	// 修正: 移除重複的反斜線
+	re := regexp.MustCompile(`^([01]\d|2[0-3]):[0-5]\d:[0-5]\d$`)
 	return re.MatchString(timeStr)
 }
 
