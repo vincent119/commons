@@ -1,4 +1,4 @@
-// Package responsex 提供 HTTP API 的標準回應結構定義。
+// Package resp 提供 HTTP API 的標準回應結構定義。
 //
 // 此套件定義了常用的 API 回應結構，適用於 Swagger/OpenAPI 文檔生成。
 //

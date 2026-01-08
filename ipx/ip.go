@@ -232,13 +232,14 @@ func GetNetworkInfo(cidr string) (*NetworkInfo, error) {
 
 	// 計算可用主機數量
 	hostBits := totalBits - prefixLen
-	if hostBits >= 64 {
+	switch {
+	case hostBits >= 64:
 		// 超過 uint64 可表示範圍，設為最大值
 		info.TotalHosts = math.MaxUint64
-	} else if hostBits > 1 {
+	case hostBits > 1:
 		// 扣除網路位址與廣播位址
 		info.TotalHosts = (1 << hostBits) - 2
-	} else {
+	default:
 		// /31 或 /32 網段
 		info.TotalHosts = 1 << hostBits
 	}

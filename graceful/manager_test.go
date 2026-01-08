@@ -10,13 +10,13 @@ import (
 
 func TestRun_GracefulShutdown(t *testing.T) {
 	// 模擬一個立即返回的任務（模擬工作完成）
-	task := func(ctx context.Context) error {
+	task := func(_ context.Context) error {
 		return nil
 	}
 
 	// 我們想要驗證當任務結束時，清理函式是否被呼叫。
 	cleanupCalled := false
-	cleanup := func(ctx context.Context) error {
+	cleanup := func(_ context.Context) error {
 		cleanupCalled = true
 		return nil
 	}
@@ -30,7 +30,7 @@ func TestRun_GracefulShutdown(t *testing.T) {
 	}
 
 	// 測試錯誤案例
-	taskErr := func(ctx context.Context) error {
+	taskErr := func(_ context.Context) error {
 		return errors.New("boom")
 	}
 
@@ -47,7 +47,7 @@ func TestRun_CleanupTimeout(t *testing.T) {
 	// 使用預設的 logger (或者可以創建一個不輸出的 logger)
 	logger := slog.Default()
 
-	task := func(ctx context.Context) error {
+	task := func(_ context.Context) error {
 		return nil
 	}
 
@@ -80,9 +80,11 @@ func TestRun_CleanupTimeout(t *testing.T) {
 
 func TestWithCloser(t *testing.T) {
 	m := &mockCloser{}
-	task := func(ctx context.Context) error { return nil }
+	task := func(_ context.Context) error { return nil }
 
-	Run(task, WithCloser(m))
+	if err := Run(task, WithCloser(m)); err != nil {
+		t.Errorf("Run() error = %v", err)
+	}
 
 	if !m.closed {
 		t.Error("closer should be closed")
@@ -93,9 +95,11 @@ func TestWithClosers(t *testing.T) {
 	m1 := &mockCloser{}
 	m2 := &mockCloser{}
 	m3 := &mockCloser{}
-	task := func(ctx context.Context) error { return nil }
+	task := func(_ context.Context) error { return nil }
 
-	Run(task, WithClosers(m1, m2, m3))
+	if err := Run(task, WithClosers(m1, m2, m3)); err != nil {
+		t.Errorf("Run() error = %v", err)
+	}
 
 	if !m1.closed || !m2.closed || !m3.closed {
 		t.Error("all closers should be closed")
@@ -109,11 +113,13 @@ func TestWithClosers_LIFO_Order(t *testing.T) {
 	c2 := &orderedCloser{id: 2, order: &closeOrder}
 	c3 := &orderedCloser{id: 3, order: &closeOrder}
 
-	task := func(ctx context.Context) error { return nil }
+	task := func(_ context.Context) error { return nil }
 
 	// 註冊順序: 1, 2, 3
 	// 預期執行順序: 3, 2, 1 (LIFO)
-	Run(task, WithClosers(c1, c2, c3))
+	if err := Run(task, WithClosers(c1, c2, c3)); err != nil {
+		t.Errorf("Run() error = %v", err)
+	}
 
 	if len(closeOrder) != 3 {
 		t.Fatalf("expected 3 closers to be closed, but only closed %d", len(closeOrder))
@@ -125,10 +131,12 @@ func TestWithClosers_LIFO_Order(t *testing.T) {
 
 func TestWithClosers_NilHandling(t *testing.T) {
 	m := &mockCloser{}
-	task := func(ctx context.Context) error { return nil }
+	task := func(_ context.Context) error { return nil }
 
 	// 傳入 nil 不應該 panic
-	Run(task, WithClosers(m, nil, m))
+	if err := Run(task, WithClosers(m, nil, m)); err != nil {
+		t.Errorf("Run() error = %v", err)
+	}
 
 	if !m.closed {
 		t.Error("non-nil closer should be closed")
@@ -157,20 +165,22 @@ func (o *orderedCloser) Close() error {
 func TestRun_CleanupOrder(t *testing.T) {
 	var executionOrder []int
 
-	task := func(ctx context.Context) error { return nil }
+	task := func(_ context.Context) error { return nil }
 
-	cleanup1 := func(ctx context.Context) error {
+	cleanup1 := func(_ context.Context) error {
 		executionOrder = append(executionOrder, 1)
 		return nil
 	}
-	cleanup2 := func(ctx context.Context) error {
+	cleanup2 := func(_ context.Context) error {
 		executionOrder = append(executionOrder, 2)
 		return nil
 	}
 
 	// 註冊順序: 1, then 2
 	// 預期執行順序: 2, then 1 (LIFO)
-	Run(task, WithCleanup(cleanup1), WithCleanup(cleanup2))
+	if err := Run(task, WithCleanup(cleanup1), WithCleanup(cleanup2)); err != nil {
+		t.Errorf("Run() error = %v", err)
+	}
 
 	if len(executionOrder) != 2 {
 		t.Fatalf("expected 2 cleaners to be executed, but only executed %d", len(executionOrder))

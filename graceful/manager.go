@@ -1,3 +1,4 @@
+// Package graceful 提供優雅關機（Graceful Shutdown）的管理器與工具。
 package graceful
 
 import (

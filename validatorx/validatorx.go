@@ -54,8 +54,8 @@ func IsTime(timeStr string) bool {
 }
 
 // IsPassword 驗證密碼強度：至少 8 碼，需包含大小寫字母與數字。
-func IsPassword(pwd string, max int) bool {
-	if len(pwd) < max {
+func IsPassword(pwd string, maxLength int) bool {
+	if len(pwd) < maxLength {
 		return false
 	}
 	hasLower := false
