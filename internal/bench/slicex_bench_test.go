@@ -1,8 +1,8 @@
 package bench
 
 import (
-	"testing"
 	"github.com/vincent119/commons/slicex"
+	"testing"
 )
 
 func BenchmarkContains_Sizes(b *testing.B) {
@@ -22,9 +22,15 @@ func BenchmarkContains_Sizes(b *testing.B) {
 		b.Run(tc.name, func(b *testing.B) {
 			// 準備資料：遞增整數 slice
 			s := make([]int, tc.n)
-			for i := 0; i < tc.n; i++ { s[i] = i }
+			for i := 0; i < tc.n; i++ {
+				s[i] = i
+			}
 			var target int
-			if tc.want >= 0 { target = s[tc.want] } else { target = -1 }
+			if tc.want >= 0 {
+				target = s[tc.want]
+			} else {
+				target = -1
+			}
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				_ = slicex.Contains(s, target)
@@ -49,9 +55,15 @@ func BenchmarkIndexOf_Sizes(b *testing.B) {
 	for _, tc := range types {
 		b.Run(tc.name, func(b *testing.B) {
 			s := make([]int, tc.n)
-			for i := 0; i < tc.n; i++ { s[i] = i }
+			for i := 0; i < tc.n; i++ {
+				s[i] = i
+			}
 			var target int
-			if tc.want >= 0 { target = s[tc.want] } else { target = -1 }
+			if tc.want >= 0 {
+				target = s[tc.want]
+			} else {
+				target = -1
+			}
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
 				_ = slicex.IndexOf(s, target)
@@ -62,7 +74,9 @@ func BenchmarkIndexOf_Sizes(b *testing.B) {
 
 func BenchmarkMap_Filter(b *testing.B) {
 	s := make([]int, 10000)
-	for i := 0; i < len(s); i++ { s[i] = i }
+	for i := 0; i < len(s); i++ {
+		s[i] = i
+	}
 	b.Run("Map", func(b *testing.B) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {

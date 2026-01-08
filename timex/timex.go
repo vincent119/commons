@@ -16,17 +16,16 @@ func NowUTC() time.Time {
 // 2) 取當地年月日
 // 3) 建立當地零點，再轉回 UTC（便於儲存/比較）
 func StartOfDay(t time.Time, loc *time.Location) time.Time {
-	local := t.In(loc)                                        // 轉到目標時區
-	y, m, d := local.Date()                                   // 取當地年月日
-	zeroLocal := time.Date(y, m, d, 0, 0, 0, 0, loc)          // 當地零點
-	return zeroLocal.UTC()                                    // 標準化成 UTC
+	local := t.In(loc)                               // 轉到目標時區
+	y, m, d := local.Date()                          // 取當地年月日
+	zeroLocal := time.Date(y, m, d, 0, 0, 0, 0, loc) // 當地零點
+	return zeroLocal.UTC()                           // 標準化成 UTC
 }
 
 // TruncateTo 將時間截斷至指定粒度（如分鐘/小時），以 UTC 作業避免跨時區差異。
 func TruncateTo(t time.Time, d time.Duration) time.Time {
 	return t.UTC().Truncate(d)
 }
-
 
 // FormatTime 格式化時間為字串。
 func FormatTime(t time.Time, layout string) string {
@@ -42,10 +41,12 @@ func ParseTime(str, layout string) (time.Time, error) {
 func TimeStamp() string {
 	return time.Now().Format("2006-01-02T15:04:05.000Z07:00")
 }
+
 // TimeStampUTC 取得目前時間的 UTC 時間戳。
 func TimeStampUTC() string {
 	return time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
 }
+
 // DateStamp 取得目前日期（YYYY-MM-DD）。
 func DateStamp() string {
 	return time.Now().Format("2006-01-02")

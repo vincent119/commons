@@ -8,7 +8,6 @@ func IsEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-
 // IsMobile 驗證手機號格式（台灣簡易版，09 開頭共 10 碼）。
 func IsMobile(mobile string) bool {
 	re := regexp.MustCompile(`^09\d{8}$`)
@@ -52,22 +51,22 @@ func IsTime(timeStr string) bool {
 }
 
 // IsPassword 驗證密碼強度：至少 8 碼，需包含大小寫字母與數字。
-func IsPassword(pwd string,max int) bool {
-       if len(pwd) < max {
-	       return false
-       }
-       hasLower := false
-       hasUpper := false
-       hasDigit := false
-       for _, c := range pwd {
-	       switch {
-	       case c >= 'a' && c <= 'z':
-		       hasLower = true
-	       case c >= 'A' && c <= 'Z':
-		       hasUpper = true
-	       case c >= '0' && c <= '9':
-		       hasDigit = true
-	       }
-       }
-       return hasLower && hasUpper && hasDigit
+func IsPassword(pwd string, max int) bool {
+	if len(pwd) < max {
+		return false
+	}
+	hasLower := false
+	hasUpper := false
+	hasDigit := false
+	for _, c := range pwd {
+		switch {
+		case c >= 'a' && c <= 'z':
+			hasLower = true
+		case c >= 'A' && c <= 'Z':
+			hasUpper = true
+		case c >= '0' && c <= '9':
+			hasDigit = true
+		}
+	}
+	return hasLower && hasUpper && hasDigit
 }

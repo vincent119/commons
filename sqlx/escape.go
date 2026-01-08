@@ -64,8 +64,9 @@ func BuildLikeQueryValue(value string, position string) string {
 
 // LikeEscapeClause 回傳 SQL 的 ESCAPE 子句字串。
 // 用法示例：
-//   q := "WHERE col LIKE ? " + sqlx.LikeEscapeClause()
-//   args := []any{sqlx.BuildLikeQueryValue(input, sqlx.LikePosBoth)}
+//
+//	q := "WHERE col LIKE ? " + sqlx.LikeEscapeClause()
+//	args := []any{sqlx.BuildLikeQueryValue(input, sqlx.LikePosBoth)}
 //
 // 注意：不同 DB 對 ESCAPE 的支援程度不同，但多數主流（MySQL/Postgres/SQLite）可用。
 // 若你們 DB 不支援，可在專案層決定不要加這段。
@@ -81,8 +82,8 @@ func EscapeSQLString(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\\`) // \ -> \\
 
 	// 轉義單引號與雙引號（視 DB/語境可能不同，這裡提供最基本處理）
-	s = strings.ReplaceAll(s, `'`, `\'`)  // ' -> \'
-	s = strings.ReplaceAll(s, `"`, `\"`)  // " -> \"
+	s = strings.ReplaceAll(s, `'`, `\'`) // ' -> \'
+	s = strings.ReplaceAll(s, `"`, `\"`) // " -> \"
 
 	// 回傳處理後字串
 	return s

@@ -1,9 +1,9 @@
 package bench
 
 import (
+	"github.com/vincent119/commons/timex"
 	"testing"
 	"time"
-	"github.com/vincent119/commons/timex"
 )
 
 func BenchmarkStartOfDay(b *testing.B) {

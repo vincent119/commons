@@ -2,7 +2,6 @@ package jsonx
 
 import "strings"
 
-
 // EscapeJSON 處理JSON字串中的特殊字符
 func EscapeJSON(s string) string {
 	s = strings.ReplaceAll(s, "\\", "\\\\")

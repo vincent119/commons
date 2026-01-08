@@ -2,9 +2,9 @@ package bench
 
 import (
 	"errors"
+	"github.com/vincent119/commons/errorx"
 	"io"
 	"testing"
-	"github.com/vincent119/commons/errorx"
 )
 
 func BenchmarkWrap(b *testing.B) {
@@ -43,11 +43,15 @@ func BenchmarkCause_Depth(b *testing.B) {
 	}
 }
 
-// 避免引入 strconv 導致干擾，簡單寫個小工具。 
+// 避免引入 strconv 導致干擾，簡單寫個小工具。
 func itoa(n int) string {
-	if n == 0 { return "0" }
+	if n == 0 {
+		return "0"
+	}
 	neg := n < 0
-	if neg { n = -n }
+	if neg {
+		n = -n
+	}
 	var buf [20]byte
 	i := len(buf)
 	for n > 0 {

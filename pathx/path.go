@@ -1,6 +1,5 @@
 package pathx
 
-
 import "strings"
 
 func NormalizePathSeparator(path string) string {

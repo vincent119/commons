@@ -1,8 +1,8 @@
 package bench
 
 import (
-	"testing"
 	"github.com/vincent119/commons/stringx"
+	"testing"
 )
 
 func BenchmarkToSnake(b *testing.B) {
