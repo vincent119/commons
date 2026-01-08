@@ -31,6 +31,8 @@ go get github.com/vincent119/commons
 | `jsonx` | JSON 字串跳脫 |
 | `pathx` | 路徑處理（分隔符正規化）|
 | `httpx/resp` | HTTP 回應結構定義 |
+| `structx` | 結構體轉 Map (StructToMap) |
+| `graceful` | 優雅關機與生命週期管理 |
 | `awsx/s3` | AWS S3 路徑工具 |
 
 ---
@@ -282,6 +284,24 @@ import "github.com/vincent119/commons/httpx/resp"
 
 resp.Error{Code: 401, Message: "unauthorized"}
 resp.Health{Status: "ok"}
+```
+
+
+---
+
+### graceful - 優雅關機
+
+提供應用程式生命週期管理，包含訊號監聽、資源釋放與超時控制 (支援 log/slog)。
+
+[詳細文件](./graceful/README.md)
+
+```go
+import "github.com/vincent119/commons/graceful"
+
+graceful.Run(task,
+    graceful.WithLogger(slog.Default()), // 使用標準 slog
+    graceful.WithCleanup(func(ctx context.Context) error { ... }),
+)
 ```
 
 ---
