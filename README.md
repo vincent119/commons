@@ -6,7 +6,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/vincent119/commons)](https://goreportcard.com/report/github.com/vincent119/commons)
 [![Go Reference](https://pkg.go.dev/badge/github.com/vincent119/commons.svg)](https://pkg.go.dev/github.com/vincent119/commons)
 [![License](https://img.shields.io/github/license/vincent119/commons.svg)](https://github.com/vincent119/commons/blob/main/LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/vincent119/commons.svg)](https://github.com/vincent119/commons/releases)
+[![Latest Tag](https://img.shields.io/github/v/tag/vincent119/commons.svg)](https://github.com/vincent119/commons/tags)
 
 一個輕量的 Go 工具庫，提供常用功能的泛型與高效能實作。
 
