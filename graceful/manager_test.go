@@ -85,7 +85,53 @@ func TestWithCloser(t *testing.T) {
 	Run(task, WithCloser(m))
 
 	if !m.closed {
-		t.Error("closer 應該被關閉")
+		t.Error("closer should be closed")
+	}
+}
+
+func TestWithClosers(t *testing.T) {
+	m1 := &mockCloser{}
+	m2 := &mockCloser{}
+	m3 := &mockCloser{}
+	task := func(ctx context.Context) error { return nil }
+
+	Run(task, WithClosers(m1, m2, m3))
+
+	if !m1.closed || !m2.closed || !m3.closed {
+		t.Error("all closers should be closed")
+	}
+}
+
+func TestWithClosers_LIFO_Order(t *testing.T) {
+	var closeOrder []int
+
+	c1 := &orderedCloser{id: 1, order: &closeOrder}
+	c2 := &orderedCloser{id: 2, order: &closeOrder}
+	c3 := &orderedCloser{id: 3, order: &closeOrder}
+
+	task := func(ctx context.Context) error { return nil }
+
+	// 註冊順序: 1, 2, 3
+	// 預期執行順序: 3, 2, 1 (LIFO)
+	Run(task, WithClosers(c1, c2, c3))
+
+	if len(closeOrder) != 3 {
+		t.Fatalf("expected 3 closers to be closed, but only closed %d", len(closeOrder))
+	}
+	if closeOrder[0] != 3 || closeOrder[1] != 2 || closeOrder[2] != 1 {
+		t.Errorf("Closer execution order error. expected [3, 2, 1], got %v", closeOrder)
+	}
+}
+
+func TestWithClosers_NilHandling(t *testing.T) {
+	m := &mockCloser{}
+	task := func(ctx context.Context) error { return nil }
+
+	// 傳入 nil 不應該 panic
+	Run(task, WithClosers(m, nil, m))
+
+	if !m.closed {
+		t.Error("non-nil closer should be closed")
 	}
 }
 
@@ -93,8 +139,18 @@ type mockCloser struct {
 	closed bool
 }
 
+type orderedCloser struct {
+	id    int
+	order *[]int
+}
+
 func (m *mockCloser) Close() error {
 	m.closed = true
+	return nil
+}
+
+func (o *orderedCloser) Close() error {
+	*o.order = append(*o.order, o.id)
 	return nil
 }
 
@@ -117,9 +173,9 @@ func TestRun_CleanupOrder(t *testing.T) {
 	Run(task, WithCleanup(cleanup1), WithCleanup(cleanup2))
 
 	if len(executionOrder) != 2 {
-		t.Fatalf("預期執行 2 個 cleanup，但執行了 %d 個", len(executionOrder))
+		t.Fatalf("expected 2 cleaners to be executed, but only executed %d", len(executionOrder))
 	}
 	if executionOrder[0] != 2 || executionOrder[1] != 1 {
-		t.Errorf("Cleanup 執行順序錯誤。預期 [2, 1]，得到 %v", executionOrder)
+		t.Errorf("Cleanup execution order error. expected [2, 1], got %v", executionOrder)
 	}
 }

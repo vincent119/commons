@@ -101,7 +101,8 @@ func main() {
 | `WithTimeout(d)` | Shutdown 階段的總體超時時間 | 30s |
 | `WithLogger(l)` | 設定 logger (支援 `*slog.Logger`) | `slog.Default()` |
 | `WithCleanup(f)` | 註冊清理函式 (LIFO 順序執行) | 無 |
-| `WithCloser(c)` | 註冊 `io.Closer` 資源 | 無 |
+| `WithCloser(c)` | 註冊單個 `io.Closer` 資源 | 無 |
+| `WithClosers(c...)` | 批量註冊多個 `io.Closer` 資源 | 無 |
 
 ## 注意事項
 
