@@ -71,3 +71,9 @@ func TimeOnlyStamp() string {
 func WithZoneTimeStamp(loc *time.Location) string {
 	return time.Now().In(loc).Format("2006-01-02T15:04:05.000Z07:00")
 }
+
+// FormatISO8601 將時間格式化為 ISO 8601 格式（帶毫秒與無冒號時區）。
+// 例如：2006-01-02T15:04:05.000+0800
+func FormatISO8601(t time.Time) string {
+	return t.Format("2006-01-02T15:04:05.000-0700")
+}

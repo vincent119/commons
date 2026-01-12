@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.2.2] - 2026-01-12
+
+### Added
+
+- **timex**: 新增 `FormatISO8601` 函式，支援帶毫秒與緊湊時區的 ISO 8601 格式 (e.g. `2026-01-12T18:09:11.000+0800`)。
+
 ## [v0.2.1] - 2026-01-08
 
 ### Added

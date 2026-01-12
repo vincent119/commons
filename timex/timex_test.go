@@ -121,3 +121,19 @@ func TestWithZoneTimeStamp(t *testing.T) {
 	ts := WithZoneTimeStamp(loc)
 	assertMatch(t, ts, `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}\+08:00$`)
 }
+
+func TestFormatISO8601(t *testing.T) {
+	loc, _ := time.LoadLocation("Asia/Taipei")
+	// 2026-01-12 18:09:11 +0800
+	in := time.Date(2026, 1, 12, 18, 9, 11, 0, loc)
+
+	got := FormatISO8601(in)
+	want := "2026-01-12T18:09:11.000+0800"
+
+	if got != want {
+		t.Errorf("FormatISO8601() = %q, want %q", got, want)
+	}
+
+	// Regex check for general validity
+	assertMatch(t, got, `^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}[+-]\d{4}$`)
+}
