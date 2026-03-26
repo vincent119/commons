@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"os"
 	"time"
 )
 
@@ -21,7 +22,7 @@ type options struct {
 func defaultOptions() *options {
 	return &options{
 		shutdownTimeout: 30 * time.Second,
-		logger:          slog.Default(),
+		logger:          slog.New(slog.NewJSONHandler(os.Stdout, nil)),
 		cleaners:        make([]Cleaner, 0),
 	}
 }

@@ -1,7 +1,10 @@
 package graceful
 
 import (
+	"bufio"
+	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"log/slog"
 	"testing"
@@ -187,5 +190,43 @@ func TestRun_CleanupOrder(t *testing.T) {
 	}
 	if executionOrder[0] != 2 || executionOrder[1] != 1 {
 		t.Errorf("Cleanup execution order error. expected [2, 1], got %v", executionOrder)
+	}
+}
+
+func TestLogFormat_JSON(t *testing.T) {
+	var buf bytes.Buffer
+
+	logger := slog.New(slog.NewJSONHandler(&buf, nil))
+
+	task := func(_ context.Context) error { return nil }
+
+	_ = Run(task,
+		WithLogger(logger),
+		WithCleanup(func(_ context.Context) error { return nil }),
+	)
+
+	// 每次 Info/Error 呼叫各輸出一行 JSON
+	scanner := bufio.NewScanner(&buf)
+	lineCount := 0
+	for scanner.Scan() {
+		lineCount++
+		line := scanner.Bytes()
+
+		t.Logf("log[%d]: %s", lineCount, line)
+
+		var entry map[string]any
+		if err := json.Unmarshal(line, &entry); err != nil {
+			t.Fatalf("第 %d 行非合法 JSON：%s", lineCount, line)
+		}
+
+		for _, key := range []string{"time", "level", "msg"} {
+			if _, ok := entry[key]; !ok {
+				t.Errorf("第 %d 行缺少欄位 %q，完整內容：%s", lineCount, key, line)
+			}
+		}
+	}
+
+	if lineCount == 0 {
+		t.Error("未產生任何 log 輸出")
 	}
 }
